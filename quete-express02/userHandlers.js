@@ -52,11 +52,25 @@ const putUser = (req, res) => {
   const id = parseInt(req.params.id);
   const { name, email } = req.body;
 
+  let query = "UPDATE users SET ";
+  let queryParams = [];
+
+  if (name) {
+    query += "name = ?, ";
+    queryParams.push(name);
+  }
+
+  if (email) {
+    query += "email = ?, ";
+    queryParams.push(email);
+  }
+
+  query = query.slice(0, -2); 
+  query += " WHERE id = ?";
+  queryParams.push(id);
+
   database
-    .query(
-      "UPDATE users SET name = ?, email = ? WHERE id = ?",
-      [name, email, id]
-    )
+    .query(query, queryParams)
     .then(([result]) => {
       if (result.affectedRows === 0) {
         res.status(404).send("Not Found");
@@ -93,5 +107,5 @@ module.exports = {
   getUserById,
   postUser,
   putUser,
-  deleteUser, // don't forget to export your function ;)
+  deleteUser,
 };
